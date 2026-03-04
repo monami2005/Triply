@@ -10,9 +10,13 @@ from datetime import datetime
 app = Flask(__name__)
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-# SQLITE for local, can be replaced by postgres for production
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tripsplit.db')
+# Use environment variables for production database (e.g. Supabase, Neon)
+# Default to local SQLite for development
+db_uri = os.environ.get('DATABASE_URL')
+if db_uri and db_uri.startswith("postgres://"):
+    db_uri = db_uri.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_uri or 'sqlite:///' + os.path.join(basedir, 'tripsplit.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 @app.route('/')
