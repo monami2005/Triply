@@ -25,7 +25,7 @@ function setupNavigation() {
     });
 }
 
-function renderView(view) {
+async function renderView(view) {
     activeView = view;
     document.querySelectorAll('.nav-link').forEach(l => {
         l.classList.toggle('active', l.dataset.view === view);
@@ -34,14 +34,26 @@ function renderView(view) {
     const container = document.getElementById('view-container');
     container.innerHTML = '<div class="loader">Loading...</div>';
 
-    switch (view) {
-        case 'trips': renderTripsView(container); break;
-        case 'dashboard': renderDashboardView(container); break;
-        case 'members': renderMembersView(container); break;
-        case 'expenses': renderExpensesView(container); break;
-        case 'whatsapp': renderWhatsAppView(container); break;
-        case 'settings': renderSettingsView(container); break;
-        case 'about': renderAboutView(container); break;
+    try {
+        switch (view) {
+            case 'trips': await renderTripsView(container); break;
+            case 'dashboard': await renderDashboardView(container); break;
+            case 'members': await renderMembersView(container); break;
+            case 'expenses': await renderExpensesView(container); break;
+            case 'whatsapp': await renderWhatsAppView(container); break;
+            case 'settings': await renderSettingsView(container); break;
+            case 'about': renderAboutView(container); break;
+        }
+    } catch (error) {
+        console.error('View Render Error:', error);
+        container.innerHTML = `
+            <div style="text-align: center; padding: 4rem;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--danger); margin-bottom: 1rem;"></i>
+                <h3>Connection Error</h3>
+                <p class="text-muted">Unable to connect to the server. Please ensure the backend is running at <strong>http://localhost:5000</strong></p>
+                <button class="btn btn-primary" style="margin-top: 1rem;" onclick="renderView('trips')">Try Again</button>
+            </div>
+        `;
     }
 }
 
@@ -151,7 +163,15 @@ function closeModal() {
 
 // --- DASHBOARD VIEW ---
 async function renderDashboardView(container) {
-    const trip = await api.getTrip(currentTripId);
+    let trip;
+    try {
+        trip = await api.getTrip(currentTripId);
+    } catch (e) {
+        localStorage.removeItem('currentTripId');
+        currentTripId = null;
+        renderView('trips');
+        return;
+    }
     const stats = trip.stats;
     container.innerHTML = `
         <header>
