@@ -1,17 +1,27 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from .models import db, Trip, Member, Expense, ExpenseParticipant, MessageTemplate, Setting
 from .database import init_db
 from .logic import calculate_trip_balances, format_whatsapp_message
 from datetime import datetime
 
+# Initialize Flask with project root knowledge
 app = Flask(__name__)
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 # SQLITE for local, can be replaced by postgres for production
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'tripsplit.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+@app.route('/')
+def index():
+    return send_from_directory(project_root, 'index.html')
+
+@app.route('/static/<path:path>')
+def serve_static(path):
+    return send_from_directory(os.path.join(project_root, 'static'), path)
 
 init_db(app)
 

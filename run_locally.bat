@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 :: Start Flask Backend in a new window
 echo [STEP 2] Starting Flask Backend...
-start "TripSplit Backend" cmd /k "python api/index.py"
+start "TripSplit Backend" cmd /k "python -m api.index"
 
 :: Wait for server to start
 timeout /t 3 /nobreak >nul

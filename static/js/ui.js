@@ -253,22 +253,32 @@ async function renderDashboardView(container) {
     loadDashboardData();
 }
 
+// --- DASHBOARD DATA & LISTS ---
 async function loadDashboardData() {
     loadRecentExpense();
     const expenses = await api.getExpenses(currentTripId);
     const list = document.getElementById('recent-transactions-list');
     if (expenses && expenses.length > 0) {
+        list.className = "fade-in";
         list.innerHTML = expenses.slice(0, 5).map(e => `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border)">
-                <div>
-                    <h5 style="margin: 0">${e.title}</h5>
-                    <p class="text-muted" style="font-size: 0.75rem">${e.date} | Paid by ${e.payer_name}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--border)">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="background: rgba(99, 102, 241, 0.1); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-receipt" style="color: var(--primary)"></i>
+                    </div>
+                    <div>
+                        <h5 style="margin: 0; font-size: 1rem; font-weight: 700">${e.title}</h5>
+                        <p class="text-white text-muted" style="font-size: 0.75rem; font-weight: 500">${e.date} | Paid by ${e.payer_name}</p>
+                    </div>
                 </div>
-                <div style="font-weight: 700; color: var(--primary)">${formatCurrency(e.amount)}</div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <div style="font-weight: 800; color: var(--primary); font-size: 1.1rem">${formatCurrency(e.amount)}</div>
+                    <button class="btn btn-sm" style="background: var(--bg-main); font-weight: 700; font-size: 0.7rem; padding: 0.4rem 0.8rem;" onclick="viewExpense('${e.id}')">VIEW</button>
+                </div>
             </div>
         `).join('');
     } else {
-        list.innerText = 'No transactions recorded yet.';
+        list.innerHTML = '<div style="text-align: center; padding: 2rem;" class="text-muted"><i class="fas fa-ghost" style="font-size: 2rem; margin-bottom: 1rem;"></i><br>No transactions recorded yet.</div>';
     }
 }
 
@@ -773,9 +783,9 @@ function renderAboutView(container) {
                 <i class="fas fa-paper-plane" style="color: white; font-size: 3rem"></i>
             </div>
             <h2 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 1rem;">TripSplit Pro <span style="color: var(--primary)">v2.2</span></h2>
-            <p class="text-muted" style="font-size: 1.1rem; max-width: 500px; margin: 0 auto 3rem;">The ultimate premium expense splitting tool for travel groups who demand excellence.</p>
+            <p class="text-muted" style="font-size: 1.1rem; max-width: 500px; margin: 0 auto 3rem;">The ultimate premium expense splitting tool for travel groups.</p>
             
-            <div class="grid" style="text-align: left; gap: 1.5rem;">
+            <div class="grid" style="text-align: left; gap: 1.5rem; margin-bottom: 3rem;">
                 <div class="card" style="background: var(--bg-main); border: 1px solid var(--border)">
                     <h4 style="margin-bottom: 1rem;"><i class="fas fa-wand-magic-sparkles" style="color: var(--primary); margin-right: 10px;"></i> Premium Interface</h4>
                     <p class="text-muted" style="font-size: 0.85rem;">Glassmorphism and GSAP animations for a state-of-the-art SaaS feel.</p>
@@ -784,6 +794,26 @@ function renderAboutView(container) {
                     <h4 style="margin-bottom: 1rem;"><i class="fab fa-whatsapp" style="color: #25D366; margin-right: 10px;"></i> WhatsApp Ready</h4>
                     <p class="text-muted" style="font-size: 0.85rem;">One-click summaries sent directly to your travel companions.</p>
                 </div>
+            </div>
+
+            <div style="text-align: left;">
+                <details style="cursor: pointer; background: var(--bg-main); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border);">
+                    <summary style="font-weight: 800; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center;">
+                        Changelog History v2.2
+                        <i class="fas fa-chevron-down"></i>
+                    </summary>
+                    <div style="padding-top: 1.5rem;">
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: 0.75rem;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> Premium Dashboard UI Overhaul</li>
+                            <li style="margin-bottom: 0.75rem;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> Member Photo and WhatsApp Integration</li>
+                            <li style="margin-bottom: 0.75rem;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> Date-wise Expense Filtering Explorer</li>
+                            <li style="margin-bottom: 0.75rem;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> WhatsApp Bulk Messaging Module</li>
+                            <li style="margin-bottom: 0.75rem;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> Custom Message Template Manager</li>
+                            <li style="margin-bottom: 0.75rem;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> Dynamic Theme & Timezone Settings</li>
+                            <li style="margin-bottom: 0.75rem;"><i class="fas fa-check-circle" style="color: var(--primary); margin-right: 10px;"></i> Robust Split Engine & Balance Sheet</li>
+                        </ul>
+                    </div>
+                </details>
             </div>
         </div>
     `;
